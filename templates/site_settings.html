@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Settings - {{ settings.site_title if settings else 'Voting System' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='admin.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <span class="navbar-brand">
+                    <i class="fas fa-cog"></i> Site Settings
+                </span>
+                <div class="navbar-nav ms-auto">
+                    <a href="/admin/dashboard" class="nav-link">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="/admin/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="main-content">
+                    <h2><i class="fas fa-cog"></i> Site Settings</h2>
+                    
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Basic Information</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="site_title" class="form-label">Site Title</label>
+                                            <input type="text" class="form-control" id="site_title" name="site_title" 
+                                                   value="{{ settings.site_title if settings else 'MUSLIM BHADALA JAMAAT' }}" required>
+                                            <div class="form-text">The main title displayed on all pages</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="site_subtitle" class="form-label">Site Subtitle</label>
+                                            <input type="text" class="form-control" id="site_subtitle" name="site_subtitle" 
+                                                   value="{{ settings.site_subtitle if settings else 'CHAIRMAN ELECTIONS 2025' }}" required>
+                                            <div class="form-text">The subtitle displayed below the main title</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="theme_color" class="form-label">Theme Color</label>
+                                            <input type="color" class="form-control form-control-color" id="theme_color" name="theme_color" 
+                                                   value="{{ settings.theme_color if settings else '#0d6efd' }}">
+                                            <div class="form-text">Primary color for the site theme</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="logo_file" class="form-label">Upload New Logo</label>
+                                            <input type="file" class="form-control" id="logo_file" name="logo_file" 
+                                                   accept="image/*,.svg">
+                                            <div class="form-text">Upload a new logo image (PNG, JPG, or SVG recommended)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Logo Preview -->
+                        {% if settings and settings.logo_path %}
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Current Logo</h4>
+                            </div>
+                            <div class="card-body text-center">
+                                <img src="{{ url_for('static', filename=settings.logo_path) }}" 
+                                     alt="Current Logo" class="img-fluid" style="max-height: 200px;">
+                                <p class="mt-2 text-muted">Current logo file: {{ settings.logo_path }}</p>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save"></i> Save Settings
+                            </button>
+                            <a href="/admin/dashboard" class="btn btn-secondary btn-lg ms-3">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Preview uploaded logo
+        document.getElementById('logo_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Create preview if it doesn't exist
+                    let preview = document.getElementById('logo-preview');
+                    if (!preview) {
+                        preview = document.createElement('div');
+                        preview.id = 'logo-preview';
+                        preview.className = 'mt-3 text-center';
+                        preview.innerHTML = '<h5>Preview:</h5><img id="preview-img" class="img-fluid" style="max-height: 150px;">';
+                        e.target.parentNode.appendChild(preview);
+                    }
+                    document.getElementById('preview-img').src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Update theme color preview
+        document.getElementById('theme_color').addEventListener('change', function(e) {
+            document.documentElement.style.setProperty('--admin-primary', e.target.value);
+        });
+    </script>
+</body>
+</html>

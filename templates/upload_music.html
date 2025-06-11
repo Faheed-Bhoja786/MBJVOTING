@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Background Music - {{ settings.site_title if settings else 'Voting System' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='admin.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid">
+                <span class="navbar-brand">
+                    <i class="fas fa-music"></i> Upload Background Music
+                </span>
+                <div class="navbar-nav ms-auto">
+                    <a href="/admin/dashboard" class="nav-link">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="/admin/logout" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="row">
+            <div class="col-12">
+                <div class="main-content">
+                    <h2><i class="fas fa-music"></i> Upload Background Music</h2>
+                    
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Note:</strong> Upload an MP3 file that will play in the background on the voting and results pages. 
+                        The music can be controlled from the admin dashboard.
+                    </div>
+
+                    <form method="POST" enctype="multipart/form-data">
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Music File Upload</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="music_file" class="form-label">Select Music File</label>
+                                    <input type="file" class="form-control" id="music_file" name="music_file" 
+                                           accept="audio/mp3,audio/mpeg,.mp3" required>
+                                    <div class="form-text">
+                                        Please upload an MP3 file. Recommended: under 10MB for faster loading.
+                                        The file will replace any existing background music.
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">File Requirements:</label>
+                                    <ul class="list-unstyled">
+                                        <li><i class="fas fa-check text-success"></i> Format: MP3 only</li>
+                                        <li><i class="fas fa-check text-success"></i> Size: Preferably under 10MB</li>
+                                        <li><i class="fas fa-check text-success"></i> Content: Appropriate for public events</li>
+                                        <li><i class="fas fa-check text-success"></i> Volume: Pre-adjusted to comfortable level</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Current Music Status -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h4>Current Music Status</h4>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Music File:</strong> 
+                                            <span class="badge bg-secondary">background-music.mp3</span>
+                                        </p>
+                                        <p><strong>Status:</strong> 
+                                            <span class="badge bg-info">Ready for Admin Control</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="text-muted">
+                                            <i class="fas fa-lightbulb"></i>
+                                            <strong>Tip:</strong> You can enable/disable music playback from the main admin dashboard 
+                                            without uploading a new file.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="fas fa-upload"></i> Upload Music
+                            </button>
+                            <a href="/admin/dashboard" class="btn btn-secondary btn-lg ms-3">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // File validation
+        document.getElementById('music_file').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const submitBtn = document.querySelector('button[type="submit"]');
+            
+            if (file) {
+                // Check file type
+                if (!file.type.includes('audio/mp3') && !file.type.includes('audio/mpeg') && !file.name.toLowerCase().endsWith('.mp3')) {
+                    alert('Please select an MP3 file only.');
+                    e.target.value = '';
+                    submitBtn.disabled = true;
+                    return;
+                }
+                
+                // Check file size (10MB = 10 * 1024 * 1024 bytes)
+                if (file.size > 10 * 1024 * 1024) {
+                    alert('File size should be under 10MB for optimal performance.');
+                    // Don't prevent upload, just warn
+                }
+                
+                // Show file info
+                const fileInfo = document.getElementById('file-info');
+                if (!fileInfo) {
+                    const info = document.createElement('div');
+                    info.id = 'file-info';
+                    info.className = 'alert alert-success mt-3';
+                    info.innerHTML = `
+                        <i class="fas fa-music"></i>
+                        <strong>Selected:</strong> ${file.name} 
+                        <span class="badge bg-primary">${(file.size / 1024 / 1024).toFixed(2)} MB</span>
+                    `;
+                    e.target.parentNode.appendChild(info);
+                }
+                
+                submitBtn.disabled = false;
+            } else {
+                submitBtn.disabled = true;
+                const fileInfo = document.getElementById('file-info');
+                if (fileInfo) {
+                    fileInfo.remove();
+                }
+            }
+        });
+        
+        // Initial state
+        document.querySelector('button[type="submit"]').disabled = true;
+    </script>
+</body>
+</html>
