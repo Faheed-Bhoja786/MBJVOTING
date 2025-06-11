@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ settings.site_title if settings else 'Voting System' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="header-section text-center py-4">
+            {% if settings and settings.logo_path %}
+            <img src="{{ url_for('static', filename=settings.logo_path) }}" alt="Logo" class="logo mb-3">
+            {% endif %}
+            <h1 class="main-title">{{ settings.site_title if settings else 'VOTING SYSTEM' }}</h1>
+            <h2 class="subtitle">{{ settings.site_subtitle if settings else 'ELECTIONS 2025' }}</h2>
+        </div>
+
+        <!-- Admin Message -->
+        {% if admin_message %}
+        <div class="alert alert-info text-center">
+            <i class="fas fa-info-circle"></i> {{ admin_message }}
+        </div>
+        {% endif %}
+
+        <!-- Countdown -->
+        {% if countdown_html %}
+        {{ countdown_html|safe }}
+        {% endif %}
+
+        <!-- Vote Success/Error Message -->
+        {% if message %}
+        <div class="alert alert-{{ 'success' if message_class == 'success' else 'danger' }} mb-4 message-alert text-center" id="vote-message">
+            <i class="fas fa-{{ 'check-circle' if message_class == 'success' else 'exclamation-triangle' }}"></i>
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <!-- Voting Form (only show if election is open) -->
+        {% if election_open %}
+        <div class="voting-section mb-5">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center mb-0"><i class="fas fa-vote-yea"></i> Cast Your Vote</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" class="vote-form">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="voter_id" class="form-label">National ID Number</label>
+                                <input type="text" class="form-control" id="voter_id" name="voter_id" 
+                                       pattern="[0-9]{8,9}" title="Enter 8 or 9 digits" required>
+                                <div class="form-text">Enter your 8 or 9 digit ID number</div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="voter_name" class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="voter_name" name="voter_name" required>
+                                <div class="form-text">Enter your full name as it appears on your ID</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Select Your Candidate</label>
+                            <div class="party-selection">
+                                {% for party, data in votes.items() %}
+                                <div class="party-option">
+                                    <input type="radio" id="{{ party }}" name="vote" value="{{ party }}" required>
+                                    <label for="{{ party }}" class="party-label">
+                                        <div class="party-card">
+                                            <img src="{{ data.image }}" alt="{{ party }}" class="party-image">
+                                            <h4 class="party-name">{{ party }}</h4>
+                                        </div>
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg vote-button">
+                                <i class="fas fa-check"></i> Submit Vote
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Current Results -->
+        <div class="results-section">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="text-center mb-0">
+                        <i class="fas fa-chart-bar"></i> 
+                        {% if election_open %}Current Results{% else %}Final Results{% endif %}
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="party-grid">
+                        {% for party, data in votes.items() %}
+                        <div class="party-card-vote">
+                            <h4 class="party-name">{{ party }}</h4>
+                            <img src="{{ data.image }}" alt="{{ party }}" class="party-candidate-image">
+                            <div class="vote-count-container-large">
+                                <div class="vote-count">{{ data.count }}</div>
+                                <div class="vote-label">votes</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer text-center py-4">
+            <p>&copy; 2025 {{ settings.site_title if settings else 'Voting System' }} - Secure Online Voting</p>
+            <div class="admin-link">
+                <a href="/admin" class="btn btn-outline-secondary btn-sm">
+                    <i class="fas fa-cog"></i> Admin Panel
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-hide success message after 5 seconds
+        setTimeout(function() {
+            const message = document.getElementById('vote-message');
+            if (message && message.classList.contains('alert-success')) {
+                message.style.transition = 'opacity 0.5s';
+                message.style.opacity = '0';
+                setTimeout(() => message.remove(), 500);
+            }
+        }, 5000);
+
+        // Auto-refresh results every 30 seconds if election is open
+        {% if election_open %}
+        setInterval(function() {
+            window.location.reload();
+        }, 30000);
+        {% endif %}
+    </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Results - {{ settings.site_title if settings else 'Voting System' }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="live-results-body">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="header-section text-center py-4">
+            {% if settings and settings.logo_path %}
+            <img src="{{ url_for('static', filename=settings.logo_path) }}" alt="Logo" class="logo mb-3">
+            {% endif %}
+            <h1 class="main-title">{{ settings.site_title if settings else 'VOTING SYSTEM' }}</h1>
+            <h2 class="subtitle">
+                {% if winner %}
+                🏆 WINNER ANNOUNCED 🏆
+                {% else %}
+                LIVE RESULTS
+                {% endif %}
+            </h2>
+        </div>
+
+        <!-- Winner Celebration -->
+        {% if winner %}
+        <div class="winner-celebration">
+            <div class="winner-announcement">
+                <div class="winner-card">
+                    <h1 class="winner-title">🎉 CONGRATULATIONS! 🎉</h1>
+                    <div class="winner-info">
+                        <img src="{{ winner_party_data[winner].image }}" alt="{{ winner }}" class="winner-image">
+                        <h2 class="winner-name">{{ winner }}</h2>
+                        <p class="winner-subtitle">ELECTED CHAIRMAN</p>
+                    </div>
+                    
+                    <!-- Winner's Party Members -->
+                    {% if party_members and party_members[winner] %}
+                    <div class="winner-members">
+                        <h3>Executive Committee</h3>
+                        <div class="members-grid">
+                            {% for member in party_members[winner] %}
+                            <div class="member-card">
+                                <h4>{{ member.name }}</h4>
+                                <p>{{ member.position }}</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Live Results Display -->
+        <div class="results-display" id="results-container">
+            <!-- Results will be loaded here -->
+        </div>
+
+        <!-- Navigation -->
+        <div class="navigation text-center py-4">
+            <a href="/" class="btn btn-primary btn-lg me-3">
+                <i class="fas fa-vote-yea"></i> Cast Your Vote
+            </a>
+            <a href="/admin" class="btn btn-outline-secondary">
+                <i class="fas fa-cog"></i> Admin Panel
+            </a>
+        </div>
+    </div>
+
+    <!-- Confetti Canvas -->
+    {% if winner %}
+    <canvas id="confetti-canvas"></canvas>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% if winner %}
+    <script src="{{ url_for('static', filename='confetti.js') }}"></script>
+    {% endif %}
+    
+    <script>
+        let currentResults = {};
+        
+        function loadResults() {
+            fetch('/api/live-results?t=' + Date.now())
+                .then(response => response.json())
+                .then(data => {
+                    if (JSON.stringify(data.results) !== JSON.stringify(currentResults)) {
+                        currentResults = data.results;
+                        updateResultsDisplay(data);
+                    }
+                    
+                    // If winner is declared and we're not already on winner view, redirect
+                    if (data.winner && !{{ 'true' if winner else 'false' }}) {
+                        window.location.href = '/winner-view';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading results:', error);
+                });
+        }
+        
+        function updateResultsDisplay(data) {
+            const container = document.getElementById('results-container');
+            const sortedResults = Object.entries(data.results)
+                .sort((a, b) => b[1].votes - a[1].votes);
+            
+            let html = '<div class="row justify-content-center">';
+            
+            sortedResults.forEach(([party, result], index) => {
+                const isLeading = index === 0 && result.votes > 0;
+                
+                html += `
+                    <div class="col-lg-4 col-md-6 mb-4">
+                        <div class="result-card ${isLeading ? 'leading' : ''}">
+                            ${isLeading ? '<div class="leading-badge"><i class="fas fa-crown"></i> LEADING</div>' : ''}
+                            <img src="${result.image}" alt="${party}" class="result-image">
+                            <h3 class="party-name">${party}</h3>
+                            <div class="vote-stats">
+                                <div class="vote-count">${result.votes}</div>
+                                <div class="vote-label">votes</div>
+                                <div class="vote-percentage">${result.percentage}%</div>
+                            </div>
+                            <div class="progress mt-3">
+                                <div class="progress-bar ${isLeading ? 'bg-warning' : 'bg-primary'}" 
+                                     style="width: ${result.percentage}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            
+            // Add total votes footer
+            html += `
+                <div class="text-center mt-4">
+                    <div class="total-votes-display">
+                        <h4><i class="fas fa-users"></i> Total Votes Cast: ${data.total_votes}</h4>
+                        <p class="text-muted">
+                            Election Status: 
+                            <span class="badge bg-${data.election_open ? 'success' : 'danger'}">
+                                ${data.election_open ? 'Open' : 'Closed'}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+        }
+        
+        // Initial load
+        loadResults();
+        
+        // Auto-refresh every 5 seconds
+        setInterval(loadResults, 5000);
+        
+        {% if winner %}
+        // Start confetti animation for winner
+        setTimeout(() => {
+            startConfetti();
+        }, 1000);
+        
+        // Play celebration sound
+        const celebrationSound = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBggABhAgABASAAgIAggQEAIIEAAGCAgABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABgAQAAoAEAAOABAAEgAQABYQEAAWEBAAGhAQABoQEAAaEBAAGhAQABoQEAAaEBAAGhAQABoQEAAaEBAAGhAQABoQEAAaEBAAGhAQABoQEAAaEBAAGhAQABoQEAAaEBAAGhAQABoQEAAWEBAAFhAQABYQEAAWEBAAFhAQABYQEAAWEBAAFhAQABYQEAAGABAAAgAQAAIAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAOABAADwAQAA8AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAADgAQAA4AEAAOABAAEgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAaABAAGgAQABoAEAAaABAAGgAQABoAEAAaABAAGgAQABoAEAAaABAAGgAQABoAEAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAQAEAAEABAABAAQAAQAEAAEABAABAAQAAQAEAAEABAABAAQAAQAEAAEABAABAAQAAQAEAAEABAABAAQAAQAEAAEABAABAAQAAQAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAgABgAgAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGABAABgAQAAYAEAAGEBAAFhAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQABYAEAAWABAAFgAQAAhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQUAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAGEBAABhAQAAYQEAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgAQAAIAEAACABAAAgMAA=' );
+        try {
+            celebrationSound.play().catch(e => console.log('Could not play sound:', e));
+        } catch(e) {
+            console.log('Sound not supported');
+        }
+        {% endif %}
+    </script>
+</body>
+</html>
