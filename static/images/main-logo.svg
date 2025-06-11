@@ -1,66 +1,30 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="200" height="80" viewBox="0 0 200 80" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
-    <linearGradient id="centerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ffd700;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#ff6b6b;stop-opacity:1" />
-    </linearGradient>
-    <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="2" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.3"/>
-    </filter>
   </defs>
   
-  <!-- Outer Circle -->
-  <circle cx="100" cy="100" r="90" fill="url(#logoGradient)" filter="url(#shadow)" stroke="#ffffff" stroke-width="3"/>
+  <!-- Background circle -->
+  <circle cx="40" cy="40" r="30" fill="url(#logoGradient)" />
   
-  <!-- Inner Decorative Ring -->
-  <circle cx="100" cy="100" r="75" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.6"/>
+  <!-- Voting box icon -->
+  <rect x="25" y="25" width="30" height="20" fill="white" rx="2" />
+  <rect x="25" y="47" width="30" height="8" fill="white" rx="1" />
+  <circle cx="32" cy="32" r="2" fill="#1e3a8a" />
+  <circle cx="40" cy="32" r="2" fill="#1e3a8a" />
+  <circle cx="48" cy="32" r="2" fill="#1e3a8a" />
   
-  <!-- Center Symbol - Ballot Box -->
-  <rect x="70" y="65" width="60" height="50" rx="5" ry="5" fill="url(#centerGradient)" stroke="#ffffff" stroke-width="2"/>
-  
-  <!-- Ballot Slot -->
-  <rect x="75" y="55" width="50" height="6" rx="3" ry="3" fill="#ffffff"/>
-  
-  <!-- Ballot Paper -->
-  <rect x="85" y="35" width="30" height="25" rx="2" ry="2" fill="#ffffff" stroke="#667eea" stroke-width="1"/>
-  
-  <!-- Check Mark on Ballot -->
-  <path d="M 92 45 L 98 50 L 108 40" stroke="#28a745" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-  
-  <!-- Decorative Stars -->
-  <g fill="#ffffff" opacity="0.8">
-    <!-- Top Star -->
-    <path d="M 100 20 L 102 26 L 108 26 L 103 30 L 105 36 L 100 32 L 95 36 L 97 30 L 92 26 L 98 26 Z"/>
-    
-    <!-- Left Star -->
-    <path d="M 30 100 L 32 106 L 38 106 L 33 110 L 35 116 L 30 112 L 25 116 L 27 110 L 22 106 L 28 106 Z"/>
-    
-    <!-- Right Star -->
-    <path d="M 170 100 L 172 106 L 178 106 L 173 110 L 175 116 L 170 112 L 165 116 L 167 110 L 162 106 L 168 106 Z"/>
-    
-    <!-- Bottom Star -->
-    <path d="M 100 180 L 102 186 L 108 186 L 103 190 L 105 196 L 100 192 L 95 196 L 97 190 L 92 186 L 98 186 Z"/>
-  </g>
-  
-  <!-- Text Around Circle -->
-  <defs>
-    <path id="circle-text" d="M 100, 100 m -85, 0 a 85,85 0 1,1 170,0 a 85,85 0 1,1 -170,0"/>
-  </defs>
-  <text font-family="Arial, sans-serif" font-size="12" font-weight="bold" fill="#ffffff">
-    <textPath href="#circle-text" startOffset="0%">
-      SECURE • TRANSPARENT • DEMOCRATIC • VOTING •
-    </textPath>
+  <!-- Text -->
+  <text x="80" y="25" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#1e3a8a">
+    VOTING
   </text>
-  
-  <!-- Center Text -->
-  <text x="100" y="135" text-anchor="middle" font-family="Arial, sans-serif" font-size="14" font-weight="bold" fill="#ffffff">
-    VOTE
+  <text x="80" y="45" font-family="Arial, sans-serif" font-size="14" fill="#3b82f6">
+    SYSTEM
   </text>
-  <text x="100" y="150" text-anchor="middle" font-family="Arial, sans-serif" font-size="10" fill="#ffffff" opacity="0.9">
-    2025
+  <text x="80" y="60" font-family="Arial, sans-serif" font-size="10" fill="#6b7280">
+    2025 Elections
   </text>
 </svg>

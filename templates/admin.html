@@ -7,7 +7,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ url_for('static', filename='admin.css') }}" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.css">
 </head>
 <body>
     <div class="container-fluid">
@@ -55,7 +54,7 @@
                 </span>
                 <div class="navbar-nav ms-auto">
                     <a href="/" class="nav-link">
-                        <i class="fas fa-vote-yea"></i> View Voting
+                        <i class="fas fa-vote-yea"></i> View Voting Page
                     </a>
                     <a href="/live-results" class="nav-link">
                         <i class="fas fa-chart-line"></i> Live Results
@@ -69,431 +68,354 @@
 
         <div class="row">
             <!-- Sidebar -->
-            <div class="col-md-3 sidebar">
-                <div class="nav flex-column nav-pills">
-                    <a class="nav-link active" data-bs-toggle="pill" href="#overview">
-                        <i class="fas fa-tachometer-alt"></i> Overview
-                    </a>
-                    <a class="nav-link" data-bs-toggle="pill" href="#election-control">
-                        <i class="fas fa-power-off"></i> Election Control
-                    </a>
-                    <a class="nav-link" data-bs-toggle="pill" href="#party-management">
-                        <i class="fas fa-users"></i> Party Management
-                    </a>
-                    <a class="nav-link" data-bs-toggle="pill" href="#database-view">
-                        <i class="fas fa-database"></i> Database View
-                    </a>
-                    <a class="nav-link" data-bs-toggle="pill" href="#site-settings">
-                        <i class="fas fa-cog"></i> Site Settings
-                    </a>
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="sidebar-content">
+                    <h5>Quick Actions</h5>
+                    <div class="list-group">
+                        <a href="#election-control" class="list-group-item list-group-item-action">
+                            <i class="fas fa-toggle-on"></i> Election Control
+                        </a>
+                        <a href="#vote-summary" class="list-group-item list-group-item-action">
+                            <i class="fas fa-chart-bar"></i> Vote Summary
+                        </a>
+                        <a href="#voter-database" class="list-group-item list-group-item-action">
+                            <i class="fas fa-database"></i> Voter Database
+                        </a>
+                        <a href="#party-management" class="list-group-item list-group-item-action">
+                            <i class="fas fa-users"></i> Party Management
+                        </a>
+                        <a href="#site-settings" class="list-group-item list-group-item-action">
+                            <i class="fas fa-cog"></i> Site Settings
+                        </a>
+                        <a href="#music-control" class="list-group-item list-group-item-action">
+                            <i class="fas fa-music"></i> Music Control
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <!-- Main Content -->
-            <div class="col-md-9 main-content">
-                <div class="tab-content">
-                    <!-- Overview Tab -->
-                    <div class="tab-pane fade show active" id="overview">
-                        <h2><i class="fas fa-chart-bar"></i> Election Overview</h2>
-                        
-                        <!-- Stats Cards -->
-                        <div class="row mb-4">
-                            <div class="col-md-3">
-                                <div class="card bg-primary text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-vote-yea fa-2x me-3"></i>
-                                            <div>
-                                                <h3 class="mb-0">{{ total_votes }}</h3>
-                                                <small>Total Votes</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+            <div class="col-md-9 col-lg-10 main-content">
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ 'danger' if category == 'error' else 'success' }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
-                            <div class="col-md-3">
-                                <div class="card bg-success text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-users fa-2x me-3"></i>
-                                            <div>
-                                                <h3 class="mb-0">{{ total_voters }}</h3>
-                                                <small>Total Voters</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-{{ 'success' if status.is_open else 'danger' }} text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-{{ 'play' if status.is_open else 'stop' }} fa-2x me-3"></i>
-                                            <div>
-                                                <h5 class="mb-0">{{ 'Open' if status.is_open else 'Closed' }}</h5>
-                                                <small>Election Status</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-3">
-                                <div class="card bg-info text-white">
-                                    <div class="card-body">
-                                        <div class="d-flex align-items-center">
-                                            <i class="fas fa-clock fa-2x me-3"></i>
-                                            <div>
-                                                <h5 class="mb-0">{{ time_remaining|int if countdown_active else 'N/A' }}</h5>
-                                                <small>Minutes Left</small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
 
-                        <!-- Live Results Chart -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4><i class="fas fa-chart-pie"></i> Live Results</h4>
+                <!-- Election Status Overview -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-info-circle"></i> Election Status</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_votes }}</div>
+                                    <div class="stat-label">Total Votes</div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <canvas id="resultsChart" width="400" height="200"></canvas>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">{{ total_voters }}</div>
+                                    <div class="stat-label">Total Voters</div>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Vote Data Table -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4><i class="fas fa-table"></i> Vote Summary</h4>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">
+                                        {% if status.is_open %}
+                                            <span class="text-success">OPEN</span>
+                                        {% else %}
+                                            <span class="text-danger">CLOSED</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="stat-label">Voting Status</div>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>Party</th>
-                                                <th>Votes</th>
-                                                <th>Percentage</th>
-                                                <th>Progress</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for party, data in vote_data.items() %}
-                                            <tr>
-                                                <td><strong>{{ party }}</strong></td>
-                                                <td>{{ data.count }}</td>
-                                                <td>{{ data.percentage }}%</td>
-                                                <td>
-                                                    <div class="progress">
-                                                        <div class="progress-bar" role="progressbar" 
-                                                             style="width: {{ data.percentage }}%">
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                            <div class="col-md-3">
+                                <div class="stat-card">
+                                    <div class="stat-number">
+                                        {% if status.winner %}
+                                            <span class="text-warning">{{ status.winner }}</span>
+                                        {% else %}
+                                            <span class="text-muted">None</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="stat-label">Winner</div>
                                 </div>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Election Control Tab -->
-                    <div class="tab-pane fade" id="election-control">
-                        <h2><i class="fas fa-power-off"></i> Election Control</h2>
-                        
-                        <!-- Election Status -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Election Status</h4>
+                <!-- Election Control Section -->
+                <div id="election-control" class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-toggle-on"></i> Election Control</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Toggle Voting -->
+                            <div class="col-md-6">
+                                <div class="control-section">
+                                    <h5>Voting Status</h5>
+                                    <form method="POST" action="/admin/toggle-election" style="display: inline;">
+                                        <button type="submit" class="btn btn-{{ 'danger' if status.is_open else 'success' }} btn-lg">
+                                            <i class="fas fa-{{ 'stop' if status.is_open else 'play' }}"></i>
+                                            {{ 'Close Voting' if status.is_open else 'Open Voting' }}
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <form method="POST" action="/admin/toggle-election" class="d-inline">
-                                    <button type="submit" class="btn btn-{{ 'danger' if status.is_open else 'success' }} btn-lg">
-                                        <i class="fas fa-{{ 'stop' if status.is_open else 'play' }}"></i>
-                                        {{ 'Close Election' if status.is_open else 'Open Election' }}
-                                    </button>
-                                </form>
-                                <p class="mt-2">
-                                    Current Status: 
-                                    <span class="badge bg-{{ 'success' if status.is_open else 'danger' }}">
-                                        {{ 'Open' if status.is_open else 'Closed' }}
-                                    </span>
-                                </p>
-                            </div>
-                        </div>
 
-                        <!-- Admin Message -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Admin Message</h4>
-                            </div>
-                            <div class="card-body">
-                                <form method="POST" action="/admin/set-message">
-                                    <div class="mb-3">
-                                        <textarea class="form-control" name="message" rows="3" 
-                                                  placeholder="Enter message to display to voters...">{{ status.message or '' }}</textarea>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Update Message
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Countdown Timer -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Countdown Timer</h4>
-                            </div>
-                            <div class="card-body">
-                                <form method="POST" action="/admin/set-countdown">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <label for="minutes" class="form-label">Minutes from now</label>
-                                            <input type="number" class="form-control" name="minutes" 
-                                                   placeholder="Enter minutes" min="1" max="1440">
-                                        </div>
-                                        <div class="col-md-6 d-flex align-items-end">
-                                            <button type="submit" class="btn btn-primary me-2">
-                                                <i class="fas fa-clock"></i> Set Countdown
-                                            </button>
-                                            <button type="submit" name="minutes" value="0" class="btn btn-secondary">
-                                                <i class="fas fa-times"></i> Clear
+                            <!-- Admin Message -->
+                            <div class="col-md-6">
+                                <div class="control-section">
+                                    <h5>Admin Message</h5>
+                                    <form method="POST" action="/admin/set-message">
+                                        <div class="input-group">
+                                            <input type="text" name="message" class="form-control" 
+                                                   placeholder="Enter message for voters" 
+                                                   value="{{ status.message or '' }}">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-paper-plane"></i> Set
                                             </button>
                                         </div>
-                                    </div>
-                                </form>
-                                {% if countdown_active %}
-                                <div class="alert alert-info mt-3">
-                                    <i class="fas fa-info-circle"></i>
-                                    Countdown active: {{ time_remaining|int }} minutes remaining
+                                    </form>
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
 
-                        <!-- Winner Declaration -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Winner Declaration</h4>
-                            </div>
-                            <div class="card-body">
-                                {% if status.winner %}
-                                <div class="alert alert-success">
-                                    <i class="fas fa-trophy"></i>
-                                    Winner declared: <strong>{{ status.winner }}</strong>
+                        <div class="row mt-3">
+                            <!-- Countdown Timer -->
+                            <div class="col-md-6">
+                                <div class="control-section">
+                                    <h5>Countdown Timer</h5>
+                                    <form method="POST" action="/admin/set-countdown">
+                                        <div class="input-group">
+                                            <input type="number" name="minutes" class="form-control" 
+                                                   placeholder="Minutes" min="1" max="1440">
+                                            <button type="submit" class="btn btn-warning">
+                                                <i class="fas fa-clock"></i> Start Countdown
+                                            </button>
+                                        </div>
+                                    </form>
+                                    {% if countdown_active %}
+                                    <div class="alert alert-info mt-2">
+                                        <i class="fas fa-clock"></i> Countdown active: {{ time_remaining|int }} minutes remaining
+                                    </div>
+                                    {% endif %}
                                 </div>
-                                <form method="POST" action="/admin/cancel-winner" class="d-inline">
-                                    <button type="submit" class="btn btn-warning">
-                                        <i class="fas fa-undo"></i> Cancel Winner Declaration
-                                    </button>
-                                </form>
-                                {% else %}
-                                <form method="POST" action="/admin/declare-winner">
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <select class="form-select" name="winner" required>
+                            </div>
+
+                            <!-- Winner Declaration -->
+                            <div class="col-md-6">
+                                <div class="control-section">
+                                    <h5>Winner Declaration</h5>
+                                    {% if not status.winner %}
+                                    <form method="POST" action="/admin/declare-winner">
+                                        <div class="input-group">
+                                            <select name="winner" class="form-select" required>
                                                 <option value="">Select Winner...</option>
                                                 {% for party in vote_data.keys() %}
                                                 <option value="{{ party }}">{{ party }}</option>
                                                 {% endfor %}
                                             </select>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <button type="submit" class="btn btn-warning">
-                                                <i class="fas fa-trophy"></i> Declare Winner
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Party Management Tab -->
-                    <div class="tab-pane fade" id="party-management">
-                        <h2><i class="fas fa-users"></i> Party Management</h2>
-                        
-                        <!-- Add New Party -->
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h4>Add New Party</h4>
-                            </div>
-                            <div class="card-body">
-                                <form method="POST" action="/admin/add-party">
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <input type="text" class="form-control" name="party_name" 
-                                                   placeholder="Party Name" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <input type="url" class="form-control" name="party_image" 
-                                                   placeholder="Image URL" required>
-                                        </div>
-                                        <div class="col-md-4">
                                             <button type="submit" class="btn btn-success">
-                                                <i class="fas fa-plus"></i> Add Party
+                                                <i class="fas fa-trophy"></i> Declare
                                             </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-
-                        <!-- Existing Parties -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>Existing Parties</h4>
-                            </div>
-                            <div class="card-body">
-                                {% for party_name, members in parties_with_members.items() %}
-                                <div class="party-section mb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h5>{{ party_name }}</h5>
-                                        <form method="POST" action="/admin/delete-party" class="d-inline">
-                                            <input type="hidden" name="party_name" value="{{ party_name }}">
-                                            <button type="submit" class="btn btn-danger btn-sm" 
-                                                    onclick="return confirm('Are you sure?')">
-                                                <i class="fas fa-trash"></i> Delete Party
-                                            </button>
-                                        </form>
-                                    </div>
-                                    
-                                    <!-- Add Member Form -->
-                                    <form method="POST" action="/admin/add-party-member" class="mb-3">
-                                        <input type="hidden" name="party_name" value="{{ party_name }}">
-                                        <div class="row">
-                                            <div class="col-md-4">
-                                                <input type="text" class="form-control" name="member_name" 
-                                                       placeholder="Member Name" required>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <input type="text" class="form-control" name="member_position" 
-                                                       placeholder="Position" required>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <button type="submit" class="btn btn-primary btn-sm">
-                                                    <i class="fas fa-user-plus"></i> Add Member
-                                                </button>
-                                            </div>
                                         </div>
                                     </form>
-                                    
-                                    <!-- Members List -->
-                                    {% if members %}
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Name</th>
-                                                    <th>Position</th>
-                                                    <th>Action</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for member in members %}
-                                                <tr>
-                                                    <td>{{ member.name }}</td>
-                                                    <td>{{ member.position }}</td>
-                                                    <td>
-                                                        <form method="POST" action="/admin/delete-party-member" class="d-inline">
-                                                            <input type="hidden" name="member_id" value="{{ member.id }}">
-                                                            <button type="submit" class="btn btn-danger btn-xs"
-                                                                    onclick="return confirm('Are you sure?')">
-                                                                <i class="fas fa-trash"></i>
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
                                     {% else %}
-                                    <p class="text-muted">No members added yet.</p>
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-trophy"></i> Winner: <strong>{{ status.winner }}</strong>
+                                    </div>
+                                    <form method="POST" action="/admin/cancel-winner">
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="fas fa-times"></i> Cancel Winner Declaration
+                                        </button>
+                                    </form>
                                     {% endif %}
                                 </div>
-                                {% endfor %}
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Database View Tab -->
-                    <div class="tab-pane fade" id="database-view">
-                        <h2><i class="fas fa-database"></i> Database View</h2>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>All Voters</h4>
-                            </div>
-                            <div class="card-body">
-                                <div class="table-responsive">
-                                    <table class="table table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>ID</th>
-                                                <th>Voter ID</th>
-                                                <th>Name</th>
-                                                <th>Party Voted</th>
-                                                <th>Voted At</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for voter in all_voters %}
-                                            <tr>
-                                                <td>{{ voter.id }}</td>
-                                                <td>{{ voter.voter_id }}</td>
-                                                <td>{{ voter.name }}</td>
-                                                <td>{{ voter.party }}</td>
-                                                <td>{{ voter.voted_at.strftime('%Y-%m-%d %H:%M:%S') if voter.voted_at else 'N/A' }}</td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                <!-- Vote Summary Section -->
+                <div id="vote-summary" class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-chart-bar"></i> Vote Summary</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for party, data in vote_data.items() %}
+                            <div class="col-md-4 mb-3">
+                                <div class="card bg-light">
+                                    <div class="card-body text-center">
+                                        <h5>{{ party }}</h5>
+                                        <h2 class="text-primary">{{ data.count }}</h2>
+                                        <p class="text-muted">{{ data.percentage }}% of total votes</p>
+                                        <div class="progress">
+                                            <div class="progress-bar" style="width: {{ data.percentage }}%"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+                            {% endfor %}
                         </div>
                     </div>
+                </div>
 
-                    <!-- Site Settings Tab -->
-                    <div class="tab-pane fade" id="site-settings">
-                        <h2><i class="fas fa-cog"></i> Site Settings</h2>
-                        
-                        <div class="card">
-                            <div class="card-header">
-                                <h4>General Settings</h4>
+                <!-- Party Management Section -->
+                <div id="party-management" class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-users"></i> Party & Candidate Management</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Current Parties</h5>
+                                <div class="party-list">
+                                    {% for party_name, members in parties_with_members.items() %}
+                                    <div class="party-item mb-3">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <h6><i class="fas fa-flag"></i> {{ party_name }}</h6>
+                                            <button class="btn btn-sm btn-outline-primary" onclick="showPartyMembers('{{ party_name }}')">
+                                                <i class="fas fa-eye"></i> View Members
+                                            </button>
+                                        </div>
+                                        <div id="members-{{ loop.index0 }}" class="party-members mt-2" style="display: none;">
+                                            {% if members %}
+                                                {% for member in members %}
+                                                <div class="member-item">
+                                                    <span class="member-name">{{ member.name }}</span>
+                                                    <span class="member-position text-muted">({{ member.position }})</span>
+                                                    <button class="btn btn-sm btn-outline-danger ms-2" onclick="removeMember({{ member.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                                {% endfor %}
+                                            {% else %}
+                                                <p class="text-muted">No members added yet</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <form method="POST" action="/admin/update-site-settings">
+                            <div class="col-md-6">
+                                <h5>Add Party Member</h5>
+                                <form id="addMemberForm">
                                     <div class="mb-3">
-                                        <label for="site_title" class="form-label">Site Title</label>
-                                        <input type="text" class="form-control" name="site_title" 
-                                               value="{{ settings.site_title if settings else '' }}">
+                                        <label class="form-label">Select Party</label>
+                                        <select class="form-select" id="memberParty" required>
+                                            <option value="">Choose party...</option>
+                                            {% for party_name in parties_with_members.keys() %}
+                                            <option value="{{ party_name }}">{{ party_name }}</option>
+                                            {% endfor %}
+                                        </select>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="site_subtitle" class="form-label">Site Subtitle</label>
-                                        <input type="text" class="form-control" name="site_subtitle" 
-                                               value="{{ settings.site_subtitle if settings else '' }}">
+                                        <label class="form-label">Member Name</label>
+                                        <input type="text" class="form-control" id="memberName" required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="logo_path" class="form-label">Logo Path</label>
-                                        <input type="text" class="form-control" name="logo_path" 
-                                               value="{{ settings.logo_path if settings else '' }}">
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="theme_color" class="form-label">Theme Color</label>
-                                        <input type="color" class="form-control" name="theme_color" 
-                                               value="{{ settings.theme_color if settings else '#0d6efd' }}">
+                                        <label class="form-label">Position</label>
+                                        <input type="text" class="form-control" id="memberPosition" 
+                                               placeholder="e.g., Chairman, Secretary, etc." required>
                                     </div>
                                     <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Update Settings
+                                        <i class="fas fa-plus"></i> Add Member
                                     </button>
                                 </form>
                             </div>
+                        </div>
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex gap-2">
+                                    <a href="/admin/manage_parties" class="btn btn-warning">
+                                        <i class="fas fa-edit"></i> Manage Parties & Images
+                                    </a>
+                                    <a href="/admin/site_settings" class="btn btn-info">
+                                        <i class="fas fa-cog"></i> Site Settings
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Music Control Section -->
+                <div id="music-control" class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-music"></i> Background Music Control</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Music Playback</h5>
+                                <div class="music-controls">
+                                    <button id="enableMusicBtn" class="btn btn-success me-2">
+                                        <i class="fas fa-play"></i> Enable Music
+                                    </button>
+                                    <button id="disableMusicBtn" class="btn btn-danger">
+                                        <i class="fas fa-stop"></i> Disable Music
+                                    </button>
+                                </div>
+                                <div id="musicStatus" class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle"></i> Music is currently <span id="musicState">disabled</span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Upload New Music</h5>
+                                <a href="/upload-music" class="btn btn-outline-primary">
+                                    <i class="fas fa-upload"></i> Upload Background Music
+                                </a>
+                                <p class="text-muted mt-2">
+                                    Upload MP3 files for background music during voting and results display.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Voter Database Section -->
+                <div id="voter-database" class="card mb-4">
+                    <div class="card-header">
+                        <h4><i class="fas fa-database"></i> Voter Database</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th><i class="fas fa-id-card"></i> Voter ID</th>
+                                        <th><i class="fas fa-user"></i> Name</th>
+                                        <th><i class="fas fa-vote-yea"></i> Voted For</th>
+                                        <th><i class="fas fa-clock"></i> Time</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="voterTableBody">
+                                    {% for voter in all_voters %}
+                                    <tr>
+                                        <td><span class="badge bg-secondary">{{ voter.voter_id }}</span></td>
+                                        <td>{{ voter.name }}</td>
+                                        <td>
+                                            <span class="badge bg-primary">{{ voter.party }}</span>
+                                        </td>
+                                        <td class="text-muted">{{ voter.voted_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -503,75 +425,165 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
     
-    {% if not login_page %}
     <script>
-        // Initialize Chart
-        const ctx = document.getElementById('resultsChart').getContext('2d');
-        const voteData = {{ vote_data|tojson }};
+        // Auto-refresh functionality
+        let autoRefreshInterval;
         
-        const labels = Object.keys(voteData);
-        const data = Object.values(voteData).map(item => item.count);
-        const colors = [
-            '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57',
-            '#FF6B9D', '#C7CEEA', '#8B9DC3', '#DDA0DD', '#98D8C8'
-        ];
-
-        new Chart(ctx, {
-            type: 'pie',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: data,
-                    backgroundColor: colors.slice(0, labels.length),
-                    borderWidth: 2,
-                    borderColor: '#fff'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                const party = context.label;
-                                const votes = context.parsed;
-                                const percentage = voteData[party].percentage;
-                                return `${party}: ${votes} votes (${percentage}%)`;
-                            }
-                        }
-                    }
+        function startAutoRefresh() {
+            autoRefreshInterval = setInterval(function() {
+                fetch('/api/admin-dashboard')
+                    .then(response => response.json())
+                    .then(data => {
+                        updateDashboard(data);
+                    })
+                    .catch(error => console.error('Error refreshing data:', error));
+            }, 5000); // Refresh every 5 seconds
+        }
+        
+        function updateDashboard(data) {
+            // Update vote counts
+            Object.keys(data.vote_data).forEach(party => {
+                const voteCard = document.querySelector(`[data-party="${party}"] .text-primary`);
+                if (voteCard) {
+                    voteCard.textContent = data.vote_data[party].count;
                 }
+                
+                const percentageCard = document.querySelector(`[data-party="${party}"] .text-muted`);
+                if (percentageCard) {
+                    percentageCard.textContent = data.vote_data[party].percentage + '% of total votes';
+                }
+                
+                const progressBar = document.querySelector(`[data-party="${party}"] .progress-bar`);
+                if (progressBar) {
+                    progressBar.style.width = data.vote_data[party].percentage + '%';
+                }
+            });
+            
+            // Update totals
+            const totalVotesElement = document.querySelector('.stat-card .stat-number');
+            if (totalVotesElement) {
+                totalVotesElement.textContent = data.total_votes;
             }
-        });
-
-        // Auto-refresh dashboard data every 30 seconds
-        setInterval(function() {
-            fetch('/admin/dashboard-data')
+        }
+        
+        // Party member management
+        function showPartyMembers(partyName) {
+            const membersDiv = document.querySelector(`#members-${Object.keys({{ parties_with_members | tojson }}).indexOf(partyName)}`);
+            if (membersDiv) {
+                membersDiv.style.display = membersDiv.style.display === 'none' ? 'block' : 'none';
+            }
+        }
+        
+        function removeMember(memberId) {
+            if (confirm('Are you sure you want to remove this member?')) {
+                fetch('/api/party_members/remove', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        member_id: memberId
+                    })
+                })
                 .then(response => response.json())
                 .then(data => {
-                    // Update vote counts and percentages
-                    const rows = document.querySelectorAll('#overview tbody tr');
-                    rows.forEach((row, index) => {
-                        const party = Object.keys(data.vote_data)[index];
-                        if (party && data.vote_data[party]) {
-                            row.cells[1].textContent = data.vote_data[party].count;
-                            row.cells[2].textContent = data.vote_data[party].percentage + '%';
-                            row.cells[3].querySelector('.progress-bar').style.width = data.vote_data[party].percentage + '%';
-                        }
-                    });
-                    
-                    // Update total votes
-                    document.querySelector('.bg-primary h3').textContent = data.total_votes;
-                    document.querySelector('.bg-success h3').textContent = data.total_voters;
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('Error removing member: ' + data.message);
+                    }
+                });
+            }
+        }
+        
+        // Add member form
+        document.getElementById('addMemberForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const party = document.getElementById('memberParty').value;
+            const name = document.getElementById('memberName').value;
+            const position = document.getElementById('memberPosition').value;
+            
+            fetch('/api/party_members/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    party_name: party,
+                    name: name,
+                    position: position
                 })
-                .catch(error => console.error('Error refreshing data:', error));
-        }, 30000);
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error adding member: ' + data.message);
+                }
+            });
+        });
+        
+        // Music control
+        document.getElementById('enableMusicBtn').addEventListener('click', function() {
+            toggleMusic(true);
+        });
+        
+        document.getElementById('disableMusicBtn').addEventListener('click', function() {
+            toggleMusic(false);
+        });
+        
+        function toggleMusic(enable) {
+            fetch('/toggle_music', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    enable: enable
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('musicState').textContent = enable ? 'enabled' : 'disabled';
+                    const statusDiv = document.getElementById('musicStatus');
+                    statusDiv.className = `alert ${enable ? 'alert-success' : 'alert-info'} mt-3`;
+                    statusDiv.innerHTML = `<i class="fas fa-${enable ? 'check' : 'info'}-circle"></i> Music is currently <span id="musicState">${enable ? 'enabled' : 'disabled'}</span>`;
+                } else {
+                    alert('Error: ' + data.message);
+                }
+            });
+        }
+        
+        // Smooth scrolling for sidebar links
+        document.querySelectorAll('.sidebar a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+        
+        // Start auto-refresh when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            startAutoRefresh();
+        });
+        
+        // Stop auto-refresh when page is not visible
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                clearInterval(autoRefreshInterval);
+            } else {
+                startAutoRefresh();
+            }
+        });
     </script>
-    {% endif %}
 </body>
 </html>

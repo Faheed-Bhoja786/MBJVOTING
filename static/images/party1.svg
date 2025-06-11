@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="party1Gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#dc2626;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ef4444;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="60" cy="60" r="55" fill="url(#party1Gradient)" stroke="#b91c1c" stroke-width="2" />
+  
+  <!-- Shield icon -->
+  <path d="M60 20 L40 30 L40 50 Q40 70 60 85 Q80 70 80 50 L80 30 Z" fill="white" />
+  
+  <!-- Star in center -->
+  <polygon points="60,35 63,45 73,45 65,52 68,62 60,55 52,62 55,52 47,45 57,45" fill="#dc2626" />
+  
+  <!-- Text -->
+  <text x="60" y="105" font-family="Arial, sans-serif" font-size="12" font-weight="bold" 
+        text-anchor="middle" fill="white">PARTY 1</text>
+</svg>
