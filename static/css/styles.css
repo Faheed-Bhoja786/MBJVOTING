@@ -1,0 +1,178 @@
+/* Custom styling for the vote tracker application */
+
+:root {
+  --accent-color: #4dbaff;
+  --accent-hover: #3398e0;
+  --success-color: #28a745;
+  --danger-color: #dc3545;
+  --warning-color: #ffc107;
+}
+
+body {
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+.vote-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.vote-icon {
+  margin: 1rem auto;
+  display: block;
+  width: 100px;
+  height: auto;
+}
+
+.vote-container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.party-card {
+  position: relative;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: transform 0.2s;
+}
+
+.party-card:hover {
+  transform: translateY(-5px);
+}
+
+.party-card .card-body {
+  padding: 1.5rem;
+}
+
+.party-vote-count {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: var(--bs-dark);
+  color: var(--bs-light);
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-weight: bold;
+  z-index: 10;
+}
+
+.vote-form {
+  margin-top: 2rem;
+}
+
+.message-container {
+  padding: 1rem;
+  margin: 1rem 0;
+  border-radius: 0.5rem;
+}
+
+.message-success {
+  background-color: var(--success-color);
+  color: white;
+}
+
+.message-error {
+  background-color: var(--danger-color);
+  color: white;
+}
+
+.admin-message {
+  background-color: var(--bs-info);
+  color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.countdown {
+  background-color: var(--warning-color);
+  color: black;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+/* Admin dashboard styles */
+.admin-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.admin-control-card {
+  height: 100%;
+}
+
+.admin-login-container {
+  max-width: 400px;
+  margin: 5rem auto;
+}
+
+.stats-card {
+  text-align: center;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.stats-card h3 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress {
+  height: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.admin-controls {
+  margin-top: 1rem;
+}
+
+/* Winner page styles */
+.winner-container {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.winner-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.winner-party {
+  font-size: 3.5rem;
+  color: var(--accent-color);
+  margin-bottom: 2rem;
+}
+
+.confetti-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.voter-table {
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .party-card {
+    margin-bottom: 1rem;
+  }
+  
+  .winner-title {
+    font-size: 2rem;
+  }
+  
+  .winner-party {
+    font-size: 2.5rem;
+  }
+}

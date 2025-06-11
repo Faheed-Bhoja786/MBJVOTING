@@ -1,0 +1,814 @@
+/* Main styles for the voting application */
+body {
+  font-family: 'Arial', 'Helvetica', sans-serif;
+  background-color: #ffffff;
+  color: #333;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+.container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 10px;
+  background-color: #ffffff;
+}
+
+/* Site Header */
+.header {
+  margin-bottom: 0.25rem;
+}
+
+.site-logo {
+  max-width: 150px;
+  height: auto;
+  margin-bottom: 0.5rem;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.site-title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.15rem;
+  color: #333;
+  text-align: center;
+}
+
+.site-subtitle {
+  font-size: 1.2rem;
+  color: #555;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+/* Admin Message */
+.admin-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  padding: 1.5rem 2rem;
+  border-radius: 8px;
+  background-color: rgba(13, 202, 240, 0.9);
+  border: 1px solid rgba(13, 202, 240, 0.7);
+  color: #fff;
+  font-size: 1.5rem;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  max-width: 80%;
+  animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Parties Container */
+.parties-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.party-box {
+  position: relative;
+  width: 250px;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.party-box:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.vote-count-container {
+  position: absolute;
+  top: -15px;
+  right: -15px;
+  width: 70px;
+  height: 70px;
+  background-color: #0d6efd;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vote-count {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.vote-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.party-image {
+  width: 150px;
+  height: 150px;
+  object-fit: contain;
+  margin: 0 auto 1rem;
+  border-radius: 8px;
+}
+
+.party-name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Voting Section */
+.voting-section {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin: 0.35rem auto;
+  max-width: 800px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+}
+
+.voting-section h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  text-align: center;
+  font-weight: 600;
+  font-family: 'Arial', sans-serif;
+  position: relative;
+}
+
+.voting-section h3:after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 3px;
+  background: #3498db;
+  margin: 15px auto 0;
+  border-radius: 2px;
+}
+
+.voter-info {
+  background: #f8f9fa;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.form-control {
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: none;
+  border-bottom: 2px solid #3498db;
+  border-radius: 0;
+  background-color: #ffffff;
+  color: #000000;
+  transition: all 0.3s ease;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  height: auto;
+}
+
+.form-control::placeholder {
+  color: #666666;
+  opacity: 1;
+}
+
+.form-control:focus {
+  border-color: #2980b9;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.form-label {
+  font-weight: 600;
+  color: #34495e;
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.party-selection {
+  margin-bottom: 2rem;
+}
+
+.party-grid {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0.25rem 0;
+  flex-wrap: wrap;
+}
+
+.party-card-vote {
+  background: white;
+  border-radius: 4px;
+  padding: 0.35rem;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  width: 140px;
+}
+
+.vote-count-container-large {
+  background-color: #0d6efd;
+  border-radius: 4px;
+  padding: 0.2rem 0.5rem;
+  color: white;
+  margin: 0;
+  width: 80%;
+  order: -1;
+}
+
+.vote-count-container-large .vote-count {
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.vote-count-container-large .vote-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.party-card-vote:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.party-card-vote .party-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+}
+
+.party-candidate-image {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: center 20%;
+  margin: 0 auto;
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.vote-button-container {
+  margin-top: 0.75rem;
+}
+
+.vote-radio {
+  display: none;
+}
+
+.vote-button {
+  display: inline-block;
+  padding: 0.8rem 2.5rem;
+  background: #3498db;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.vote-button:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+.vote-radio:checked + .vote-button {
+  background: #27ae60;
+  box-shadow: 0 2px 8px rgba(39, 174, 96, 0.3);
+}
+
+.form-check-label {
+  font-size: 1.25rem;
+  color: #333;
+  font-weight: 500;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Improve form inputs */
+.form-control {
+  padding: 12px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Submit button */
+.btn-primary {
+  padding: 8px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+}
+
+/* Countdown */
+.countdown {
+  background-color: rgba(238, 153, 26, 0.15);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  color: #ffc107;
+  text-align: center;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  font-size: 1.25rem;
+}
+
+#countdown-timer {
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+/* Message alerts */
+.message-alert {
+  padding: 1.2rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.alert-success {
+  background-color: #d1e7dd;
+  color: #0f5132;
+  border: 2px solid #badbcc;
+}
+
+.alert-error, .alert-danger {
+  background-color: #f8d7da;
+  color: #842029;
+  border: 2px solid #f5c2c7;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  border: 2px solid #ffecb5;
+}
+
+.alert-info {
+  background-color: #cff4fc;
+  color: #055160;
+  border: 2px solid #b6effb;
+}
+
+/* Admin dashboard styles */
+.dashboard-section {
+  background-color: #1e2a45;
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-section h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #fff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.75rem;
+}
+
+.vote-bar {
+  height: 30px;
+  background-color: #0d6efd;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+
+/* Tables */
+.table {
+  color: #e9ecef;
+}
+
+.table-dark {
+  background-color: #293858;
+}
+
+.table-dark th {
+  background-color: #1e2a45;
+}
+
+/* Buttons */
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0a58ca;
+}
+
+.btn-primary:hover {
+  background-color: #0a58ca;
+  border-color: #084298;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #b02a37;
+}
+
+.btn-danger:hover {
+  background-color: #b02a37;
+  border-color: #842029;
+}
+
+.btn-success {
+  background-color: #198754;
+  border-color: #146c43;
+}
+
+.btn-success:hover {
+  background-color: #146c43;
+  border-color: #0f5132;
+}
+
+/* Winner styles */
+.winner-page {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.winner-title {
+  font-size: 3rem;
+  color: gold;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  margin-bottom: 2rem;
+}
+
+.winner-image {
+  max-width: 300px;
+  margin: 0 auto 2rem;
+}
+
+/* New Winner Celebration Styles */
+.winner-celebration {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.85);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+#confetti-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2001;
+  pointer-events: none;
+}
+
+.winner-announcement {
+  position: relative;
+  z-index: 2005;
+  text-align: center;
+  padding: 2rem;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 1rem;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.7);
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: scaleIn 0.7s ease-out;
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0.7); opacity: 0; }
+  70% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.celebration-header {
+  color: #FF5722;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.winner-party-name {
+  color: #2196F3;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.winner-vote-details {
+  margin: 1rem 0;
+  font-size: 1.5rem;
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.winner-image-container {
+  margin: 1.5rem auto;
+  max-width: 300px;
+  border: 5px solid gold;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+}
+
+.winner-image-container img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.party-members-section {
+  margin-top: 2rem;
+  width: 100%;
+  border-top: 2px dashed #3F51B5;
+  padding-top: 1rem;
+}
+
+.members-title {
+  color: #3F51B5;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.party-member {
+  padding: 0.75rem;
+  background-color: rgba(63, 81, 181, 0.1);
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.party-member .name {
+  font-weight: bold;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.party-member .position {
+  color: #555;
+  font-style: italic;
+}
+
+/* Balloon Animation */
+.balloons-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2002;
+}
+
+.balloon {
+  position: absolute;
+  width: var(--balloon-size, 4rem);
+  height: var(--balloon-size, 4rem);
+  background-color: var(--balloon-color, rgba(255, 0, 0, 0.7));
+  border-radius: 50%;
+  bottom: -20%;
+  animation: float var(--floating-time, 10s) ease-in-out infinite;
+  animation-delay: var(--floating-delay, 0s);
+}
+
+.balloon:nth-child(odd) {
+  left: calc(10% + (var(--balloon-index, 0) * 10%));
+}
+
+.balloon:nth-child(even) {
+  right: calc(10% + (var(--balloon-index, 0) * 10%));
+}
+
+.balloon::before {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+@keyframes float {
+  0% {
+    bottom: -20%;
+    transform: translateX(0) rotate(0);
+  }
+  50% {
+    transform: translateX(20px) rotate(10deg);
+  }
+  75% {
+    transform: translateX(-20px) rotate(-10deg);
+  }
+  100% {
+    bottom: 120%;
+    transform: translateX(0) rotate(0);
+  }
+}
+
+/* Fireworks animation */
+.pyro {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  z-index: 2003;
+  pointer-events: none;
+}
+
+.pyro > .before, .pyro > .after {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff, 0 0 #fff;
+  animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position linear infinite backwards;
+}
+
+.pyro > .after {
+  animation-delay: 1.25s, 1.25s, 1.25s;
+  animation-duration: 1.25s, 1.25s, 6.25s;
+}
+
+@keyframes bang {
+  to {
+    box-shadow: -70px -115.67px #00ff73, -28px -99.67px #ff00c8, 58px -31.67px #ff009d, 13px -7.67px #ff00d5, -19px -176.67px #00ffd0, -2px -74.67px #00ffea, 1px -13.67px #99ff00, -65px -32.67px #ff008c, -32px -123.67px #ffa600, -24px 31.33px #ff006f, 16px -158.67px #00ffcc, -24px -51.67px #ff00d0, 72px -100.67px #ffcc00, 93px 31.33px #ff0040, -56px -179.67px #00ff73, 6px -166.67px #0040ff, 25px -215.67px #4400ff, 2px -223.67px #ff0048, 38px -18.67px #0099ff, 94px -216.67px #0059ff, 53px -150.67px #a6ff00, -63px -39.67px #ff0062, -28px 18.33px #0051ff, 88px -17.67px #0095ff, 32px -30.67px #ff0037, -73px -16.67px #00ff40, -20px -233.67px #8c00ff, 65px 32.33px #0026ff, -13px 29.33px #00eeff, -57px -14.67px #ffb300, 13px 24.33px #ff002f, 65px -198.67px #00ff7b, 3px -150.67px #00ffa2, -58px -105.67px #ff004d, -63px -168.67px #ff005e, 57px -41.67px #ff9900, -18px -41.67px #ff005e, 68px -109.67px #ffae00, 97px -4.67px #ff0037, 71px -77.67px #2bff00, -97px -88.67px #00ffbf, -56px -209.67px #007bff, -30px -231.67px #ff0084, -91px -16.67px #0026ff, 49px -25.67px #0040ff, -78px -213.67px #00ff8c, 42px -139.67px #0066ff, -64px -39.67px #00ff3c, 99px -203.67px #a2ff00, 91px -148.67px #9500ff;
+  }
+}
+
+@keyframes gravity {
+  to {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+}
+
+@keyframes position {
+  0%, 19.9% {
+    margin-top: 5%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 10%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+}
+
+/* Animate vote counts */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.vote-count-update {
+  animation: pulse 0.5s ease;
+}
+
+/* Media queries */
+@media (max-width: 768px) {
+  .parties-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .party-box {
+    width: 100%;
+    max-width: 300px;
+  }
+}
+
+/* Logo display in admin panel */
+.logo-preview {
+  max-width: 200px;
+  max-height: 150px;
+  margin: 1rem 0;
+}
+
+/* Party member styles */
+.member-item {
+  background-color: #f8f9fa;
+  transition: background-color 0.2s ease;
+}
+
+.member-item .card-body {
+  color: #333;
+}
+
+.member-item:hover {
+  background-color: #e9ecef;
+}
+
+.member-name-text,
+.member-position-text {
+  color: #333;
+}
+
+/* Footer styles */
+.footer {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #dee2e6;
+  text-align: center;
+  color: #333;
+  font-size: 1rem;
+  font-family: 'Arial', sans-serif;
+}
+
+.footer p {
+  margin-bottom: 0.5rem;
+}
+
+.admin-link {
+  color: inherit;
+  text-decoration: none;
+  font-family: 'Arial', sans-serif;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.admin-link:hover {
+  color: inherit;
+  text-decoration: none;
+}

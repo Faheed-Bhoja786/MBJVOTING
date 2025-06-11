@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>MUSLIM BHADALA JAMAAT CHAIRMAN ELECTIONS 2025</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- We'll use AJAX instead of meta refresh -->
+  <!-- jQuery for smoother animations -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>MUSLIM BHADALA JAMAAT</h1>
+      <h2>CHAIRMAN ELECTIONS 2025</h2>
+    </header>
+
+    {% if admin_message %}
+      <div class="admin-message" id="admin-message">
+        {{ admin_message }}
+      </div>
+      <script>
+        // Make admin messages disappear after 10 seconds
+        setTimeout(function() {
+          $("#admin-message").fadeOut(1000);
+        }, 10000);
+      </script>
+    {% endif %}
+
+    <div class="countdown-container" id="countdown" style="display: none;">
+      <div class="big-countdown">
+        <span id="countdown-minutes">00</span>:<span id="countdown-seconds">00</span>
+      </div>
+      <div class="countdown-text">Time remaining until winner declaration</div>
+    </div>
+
+    <div class="voter-id-container">
+      <label class="id-label">Enter Your 8 to 9-digit Voter ID:</label>
+      <input type="text" id="main_voter_id" class="id-input" maxlength="9" minlength="8" pattern="\d{8,9}" required {% if not election_open %}disabled{% endif %}>
+    </div>
+
+    {% if message %}
+      <div class="message {{ message_class }}" id="vote-message">{{ message }}</div>
+      <script>
+        // Make vote messages disappear after 10 seconds
+        setTimeout(function() {
+          $("#vote-message").fadeOut(1000);
+        }, 10000);
+      </script>
+    {% endif %}
+
+    <div class="parties-container">
+      {% for party, data in votes.items() %}
+        <div class="party-box">
+          <div class="vote-count">{{ data["count"] }}</div>
+          <div class="image-container">
+            <img src="{{ url_for('static', filename=data['image']) }}" alt="{{ party }}">
+          </div>
+          <h3 class="party-name">{{ party }}</h3>
+
+          {% if election_open %}
+          <form method="POST" onsubmit="return validateVoterId()">
+            <input type="hidden" name="vote" value="{{ party }}">
+            <input id="voter_id_{{ loop.index }}" name="voter_id" type="hidden">
+            <button type="submit" class="vote-button" onclick="copyVoterId({{ loop.index }})">VOTE</button>
+          </form>
+          {% else %}
+          <button class="vote-button disabled" disabled>VOTING CLOSED</button>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+
+    <footer>
+      <p>Secure Electronic Voting System | Built by Faheed Bhoja</p>
+      <p class="admin-link"><a href="{{ url_for('admin_login') }}">Election Administrator</a></p>
+    </footer>
+  </div>
+
+  <script>
+    function copyVoterId(index) {
+      const mainId = document.getElementById('main_voter_id').value.trim();
+      document.getElementById('voter_id_' + index).value = mainId;
+    }
+
+    function validateVoterId() {
+      const mainId = document.getElementById('main_voter_id').value.trim();
+
+      if (!mainId || mainId.length < 8 || mainId.length > 9 || !/^\d+$/.test(mainId)) {
+        alert('Please enter a valid 8 to 9-digit Voter ID');
+        return false;
+      }
+      return true;
+    }
+
+    // Use AJAX to update vote counts every 2 seconds
+    function updateVoteCounts() {
+      $.ajax({
+        url: '/get_vote_counts',
+        type: 'GET',
+        success: function(data) {
+          // Update vote counts
+          for (const party in data.votes) {
+            const count = data.votes[party].count;
+            $(`.party-box:contains("${party}") .vote-count`).text(count);
+          }
+
+          // Update admin message if it exists
+          if (data.admin_message) {
+            if ($("#admin-message").length) {
+              $("#admin-message").html(data.admin_message);
+              $("#admin-message").show();
+            } else {
+              $("header").after(`<div class="admin-message" id="admin-message">${data.admin_message}</div>`);
+              setTimeout(function() {
+                $("#admin-message").fadeOut(1000);
+              }, 10000);
+            }
+          } else {
+            $("#admin-message").fadeOut(1000);
+          }
+
+          // Update countdown timer if it exists
+          if (data.countdown) {
+            $("#countdown").show();
+            startCountdown(data.countdown.seconds_remaining);
+          } else {
+            $("#countdown").hide();
+            clearInterval(countdownInterval);
+          }
+
+          // Check if voting is closed
+          if (!data.election_open) {
+            $(".vote-button").text("VOTING CLOSED").addClass("disabled").prop("disabled", true);
+            $("#main_voter_id").prop("disabled", true);
+          } else {
+            $(".vote-button").text("VOTE").removeClass("disabled").prop("disabled", false);
+            $("#main_voter_id").prop("disabled", false);
+          }
+
+          // Check for redirection
+          if (data.redirect) {
+            window.location.href = data.redirect;
+          }
+        },
+        error: function(error) {
+          console.error("Error updating vote counts:", error);
+        }
+      });
+    }
+
+    let countdownInterval;
+
+    function startCountdown(seconds) {
+        clearInterval(countdownInterval);
+        let minutes = Math.floor(seconds / 60);
+        let remainingSeconds = seconds % 60;
+
+        countdownInterval = setInterval(() => {
+          if (remainingSeconds <= 0 && minutes <= 0) {
+            clearInterval(countdownInterval);
+            $("#countdown").fadeOut(1000);
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
+            return;
+          }
+          if (remainingSeconds <= 0) {
+            minutes--;
+            remainingSeconds = 59;
+          }
+          $("#countdown-minutes").text(minutes.toString().padStart(2,'0'));
+          $("#countdown-seconds").text(remainingSeconds.toString().padStart(2,'0'));
+          remainingSeconds--;
+        }, 1000);
+      }
+
+
+    // Update vote counts every 2 seconds
+    $(document).ready(function() {
+      setInterval(updateVoteCounts, 2000);
+    });
+  </script>
+</body>
+</html>
